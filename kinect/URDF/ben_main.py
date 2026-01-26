@@ -178,23 +178,44 @@ class KinectTracking(object):
         left_end_effector = tracked.SkeletonPositions[JointId.WristLeft]
         left_origin = tracked.SkeletonPositions[JointId.ShoulderLeft]
 
-        mapped_Left_end_eff = [
+        right_end_effector = tracked.SkeletonPositions[JointId.WristRight]
+        right_origin = tracked.SkeletonPositions[JointId.ShoulderRight]
+
+        mapped_left_end_eff = [
             (left_end_effector.x - left_origin.x),
             (left_end_effector.y - left_origin.y),
             (left_end_effector.z - left_origin.z)
         ]
 
-        target = np.array([-mapped_Left_end_eff[2], mapped_Left_end_eff[0], mapped_Left_end_eff[1]])
+        mapped_right_end_eff = [
+            (right_end_effector.x - right_end_effector.x),
+            (right_end_effector.y - right_end_effector.y),
+            (right_end_effector.z - right_end_effector.z)
+        ]
+
+        left_target = np.array([-mapped_left_end_eff[2], mapped_left_end_eff[0], mapped_left_end_eff[1]])
         target_frame = np.eye(4)
-        target_frame[:3, 3] = target
-        ik_sol = ben.left_arm.inverse_kinematics(target_frame, initial_position=[0]*len(ben.left_arm.links))
-        angles_deg = np.degrees(ik_sol)
+        target_frame[:3, 3] = left_target
+        left_ik_sol = ben.left_arm.inverse_kinematics(target_frame, initial_position=[0]*len(ben.left_arm.links))
+        left_angles_deg = np.degrees(left_ik_sol)
+
+        right_target = np.array([-mapped_left_end_eff[2], mapped_left_end_eff[0], mapped_left_end_eff[1]])
+        target_frame = np.eye(4)
+        target_frame[:3, 3] = right_target
+        right_ik_sol = ben.left_arm.inverse_kinematics(target_frame, initial_position=[0]*len(ben.right_arm.links))
+        right_angles_deg = np.degrees(right_ik_sol)
 
         # Build single message with all servo commands
         angles = {
-            13: angles_deg[2],
-            14: angles_deg[1],
-            8: angles_deg[3]
+            #left
+            13: left_angles_deg[2],
+            14: left_angles_deg[1],
+            8: left_angles_deg[3],
+
+            #right
+            16: right_angles_deg[2],
+            17: right_angles_deg[1],
+            18: right_angles_deg[3]
         }
 
         self.send_all_servos(angles)
