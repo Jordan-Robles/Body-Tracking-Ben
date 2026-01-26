@@ -175,28 +175,26 @@ class KinectTracking(object):
         self.current_skeleton = tracked
 
         # ----------- JOINTS -----------
+        left_end_effector = tracked.SkeletonPositions[JointId.WristLeft]
+        left_origin = tracked.SkeletonPositions[JointId.ShoulderLeft]
 
-        #left arm
-        left_shoulder = tracked.SkeletonPositions[JointId.ShoulderLeft]
-        left_elbow    = tracked.SkeletonPositions[JointId.ElbowLeft]
-        left_wrist    = tracked.SkeletonPositions[JointId.WristLeft]
+        mapped_Left_end_eff = [
+            (left_end_effector.x - left_origin.x),
+            (left_end_effector.y - left_origin.y),
+            (left_end_effector.z - left_origin.z)
+        ]
 
-        right_shoulder = tracked.SkeletonPositions[JointId.ShoulderRight]
-        right_elbow    = tracked.SkeletonPositions[JointId.ElbowRight]
-        right_wrist    = tracked.SkeletonPositions[JointId.WristRight]
-
-        target = np.array([left_wrist.x, left_wrist.y, left_wrist.z])
+        target = np.array([-mapped_Left_end_eff[2], mapped_Left_end_eff[0], mapped_Left_end_eff[1]])
         target_frame = np.eye(4)
         target_frame[:3, 3] = target
-        angles = ben.left_arm.inverse_kinematics(target_frame, initial_position=[0]*len(ben.left_arm.links))
-       
-
+        ik_sol = ben.left_arm.inverse_kinematics(target_frame, initial_position=[0]*len(ben.left_arm.links))
+        angles_deg = np.degrees(ik_sol)
 
         # Build single message with all servo commands
         angles = {
-            13: angles[1],
-            14: angles[0],
-            8: angles[2]
+            13: angles_deg[2],
+            14: angles_deg[1],
+            8: angles_deg[3]
         }
 
         self.send_all_servos(angles)

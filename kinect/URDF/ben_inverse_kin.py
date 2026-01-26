@@ -63,7 +63,7 @@ now = time.time()
 ben = benURDFV2.Ben()
 
 # ...existing code...
-target_position = [0.1, -0.1, -0.02]
+target_position = [0.1, -0.1, -0.1]
 ik_sol = ben.ik_target(target_position,ben.left_arm)
 angles_deg = np.degrees(ik_sol)
 
