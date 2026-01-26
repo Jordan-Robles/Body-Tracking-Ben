@@ -18,44 +18,43 @@ class Ben():
     def benURDF(self):
         torso = Chain(name="toseo", links=[
             OriginLink(),
-            URDFLink(
-                name="torso_base",
-                translation_vector=[0,0,0],
-                orientation=[0,0,0],
-                rotation=[0,0,0],
-                bounds=(-np.pi, np.pi)
-            )
-        ]
+            
+        ])
                     
-                    
-                    )
 
         left_arm = Chain(name="left_arm", links=[
             OriginLink(),
             # left_shoulder (fixed to torso)
             URDFLink(
                 name="left_shoulder_pitch",
-                translation_vector=[0, -0.1, 0],
-                orientation=[0, 0, 0],
-                rotation=[0,0,1],
+                translation_vector=[0, -0.0588, 0],
+                orientation=[0, 0, -np.pi/2],
+                rotation=[1,0,0],
                 bounds=(-np.pi, np.pi)
             ),
 
             #left shoulder (yaw)
             URDFLink(
                 name="left_shoulder_yaw",
-                translation_vector=[0, 0.1, 0],
-                orientation=[0, 0, 0],
-                rotation=[0, 0, 1],   # Z axis
+                translation_vector=[0.0232, 0, -0.015],
+                orientation=[0, np.pi, np.pi],
+                rotation=[0, 1, 0],  
                 bounds=(-np.pi, np.pi)
             ),
 
             #Left elbow pitch
             URDFLink(
                 name="elbow",
-                translation_vector=[0, 0.1, 0],
-                orientation=[0, 0, 0],
+                translation_vector=[0, 0, 0.0935],
+                orientation=[0, 0, np.pi],
                 rotation=[0, 1, 0],   # Y axis
+                bounds=(0, np.pi/2)
+            ),
+            URDFLink(
+                name="wrist",
+                translation_vector=[0, 0, 0.0381],
+                orientation=[0, 0, 0],
+                rotation=[1, 0, 0],   # Y axis
                 bounds=(-np.pi/2, np.pi/2)
             ),
 
@@ -64,19 +63,19 @@ class Ben():
 
         right_arm = Chain(name="right_arm", links=[
             OriginLink(),
-            # left_shoulder (fixed to torso)
+            # right_shoulder (fixed to torso)
             URDFLink(
                 name="right_shoulder_pitch",
-                translation_vector=[0, 0, 0],
+                translation_vector=[0, 0.0588, 0],
                 orientation=[0, 0, 0],
-                rotation=[0,0,1],
+                rotation=[0,1,0],
                 bounds=(-np.pi, np.pi)
             ),
 
-            #left shoulder (yaw)
+            #right shoulder (yaw)
             URDFLink(
                 name="right_shoulder_yaw",
-                translation_vector=[0, 0, 0.1],
+                translation_vector=[0, 0.0232, -0.015],
                 orientation=[0, 0, 0],
                 rotation=[0, 0, 1],   # Z axis
                 bounds=(-np.pi, np.pi)
@@ -85,15 +84,73 @@ class Ben():
             #Right elbow pitch
             URDFLink(
                 name="elbow",
-                translation_vector=[0.15, 0, 0],
+                translation_vector=[0, 0.0935, 0],
                 orientation=[0, 0, 0],
-                rotation=[0, 1, 0],   # Y axis
+                rotation=[1, 0, 0],   # Y axis
+                bounds=(-np.pi/2, np.pi/2)
+            ),
+            URDFLink(
+                name="wrist",
+                translation_vector=[0, 0.0381, 0],
+                orientation=[0, 0, 0],
+                rotation=[1, 0, 0],   # Y axis
                 bounds=(-np.pi/2, np.pi/2)
             ),
 
 
         ])
         return torso, left_arm, right_arm
+    
+    def plot_joint_frames(self, plot_axis, chain, angles, axis_length = 0.03):
+        transforms = chain.forward_kinematics(angles, full_kinematics=True)
+        for i, transform in enumerate(transforms):
+            origin = transform[:3, 3]
+            
+    # Extract rotation matrix columns (these are the axis directions)
+            x_axis = transform[:3, 0]  # Red - X axis
+            y_axis = transform[:3, 1]  # Green - Y axis  
+            z_axis = transform[:3, 2]  # Blue - Z axis
+            
+            # Plot X axis (red)
+            plot_axis.quiver(origin[0], origin[1], origin[2],
+                    x_axis[0], x_axis[1], x_axis[2],
+                    length=axis_length, color='r', arrow_length_ratio=0.3)
+            
+            # Plot Y axis (green)
+            plot_axis.quiver(origin[0], origin[1], origin[2],
+                    y_axis[0], y_axis[1], y_axis[2],
+                    length=axis_length, color='g', arrow_length_ratio=0.3)
+            
+            # Plot Z axis (blue)
+            plot_axis.quiver(origin[0], origin[1], origin[2],
+                    z_axis[0], z_axis[1], z_axis[2],
+                    length=axis_length, color='b', arrow_length_ratio=0.3)
+
+
+
+    def debug(self, left_angles, right_angles):
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+
+        
+        self.left_arm.plot(left_angles, ax)
+        self.right_arm.plot(right_angles, ax)
+        self.plot_joint_frames(ax, self.left_arm, left_angles)
+        self.plot_joint_frames(ax, self.right_arm, right_angles)
+
+        # Axes formatting
+        ax.set_xlabel('X')
+        ax.set_ylabel('Y')
+        ax.set_zlabel('Z')
+
+        ax.set_xlim(-0.3,0.3)
+        ax.set_ylim(-0.3,0.3)
+        ax.set_zlim(0,0.4)
+
+        ax.set_title("Ben")
+        plt.show()
+    
+
     
     def ik_target(self, target_position, arm):
         target_frame = np.eye(4)
@@ -133,8 +190,12 @@ class Ben():
         ax.set_zlim(0,0.4)
         ax.set_title("3-DOF Robot Arm Visualization")
         plt.show()
+    
 
 if __name__ == "__main__":
     ben = Ben()
+    left_angles = [0, np.radians(0), np.radians(90), np.radians(-90),np.radians(0)]
+    right_angles = [0, np.radians(0), np.radians(0), np.radians(0),np.radians(0)]
+    ben.debug(left_angles,right_angles)
     target_position = [0.2, 0.05, 0.15]
-    ben.ik_target(target_position, ben.left_arm)
+    #ben.ik_target(target_position, ben.left_arm)
