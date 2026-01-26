@@ -24,38 +24,40 @@ class Ben():
 
         left_arm = Chain(name="left_arm", links=[
             OriginLink(),
+            #14
             # left_shoulder (fixed to torso)
             URDFLink(
                 name="left_shoulder_pitch",
                 translation_vector=[0, -0.0588, 0],
                 orientation=[0, 0, -np.pi/2],
                 rotation=[1,0,0],
-                bounds=(-np.pi, np.pi)
+                bounds=(np.radians(-45), np.radians(150))
             ),
 
+            #13
             #left shoulder (yaw)
             URDFLink(
                 name="left_shoulder_yaw",
                 translation_vector=[0.0232, 0, -0.015],
                 orientation=[0, np.pi, np.pi],
                 rotation=[0, 1, 0],  
-                bounds=(-np.pi, np.pi)
+                bounds=(np.radians(30), np.radians(150))
             ),
-
+            #8
             #Left elbow pitch
             URDFLink(
                 name="elbow",
                 translation_vector=[0, 0, 0.0935],
                 orientation=[0, 0, np.pi],
                 rotation=[0, 1, 0],   # Y axis
-                bounds=(0, np.pi/2)
+                bounds=(np.radians(-120), np.radians(150))
             ),
             URDFLink(
                 name="wrist",
                 translation_vector=[0, 0, 0.0381],
                 orientation=[0, 0, 0],
                 rotation=[1, 0, 0],   # Y axis
-                bounds=(-np.pi/2, np.pi/2)
+                bounds=(np.radians(-120), np.radians(150))
             ),
 
 
@@ -69,7 +71,7 @@ class Ben():
                 translation_vector=[0, 0.0588, 0],
                 orientation=[0,0,np.pi/2],
                 rotation=[1,0,0],
-                bounds=(-np.pi, np.pi)
+                bounds=(np.radians(-45), np.radians(150))
             ),
 
             #right shoulder (yaw)
@@ -78,7 +80,7 @@ class Ben():
                 translation_vector=[0.0232, 0, -0.015],
                 orientation=[0, np.pi, np.pi],
                 rotation=[0, 1, 0],   # Z axis
-                bounds=(-np.pi, np.pi)
+                bounds=(np.radians(30), np.radians(150))
             ),
 
             #Right elbow pitch
@@ -87,14 +89,14 @@ class Ben():
                 translation_vector=[0, 0, 0.0935],
                 orientation=[0, 0, -np.pi],
                 rotation=[0, 1, 0],   # Y axis
-                bounds=(-np.pi/2, np.pi/2)
+                bounds=(np.radians(-120), np.radians(150))
             ),
             URDFLink(
                 name="wrist",
                 translation_vector=[0, 0, 0.0381],
                 orientation=[0, 0, 0],
                 rotation=[1, 0, 0],   # Y axis
-                bounds=(-np.pi/2, np.pi/2)
+                bounds=(np.radians(-120), np.radians(150))
             ),
 
 
@@ -194,8 +196,10 @@ class Ben():
 
 if __name__ == "__main__":
     ben = Ben()
-    left_angles = [0, np.radians(0), np.radians(0), np.radians(0),np.radians(0)]
+    """
+    left_angles = [0, np.radians(200), np.radians(90), np.radians(90),np.radians(0)]
     right_angles = [0, np.radians(0), np.radians(0), np.radians(0),np.radians(0)]
     ben.debug(left_angles,right_angles)
     target_position = [0.2, 0.05, 0.15]
     #ben.ik_target(target_position, ben.left_arm)
+    """
