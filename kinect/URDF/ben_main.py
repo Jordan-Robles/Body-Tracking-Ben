@@ -27,6 +27,8 @@ print("Serial connected")
 SEND_INTERVAL = 0.1       # seconds (10 Hz)
 DEADBAND = 3              # degrees
 
+ben = benURDFV2.Ben()
+
 #================= SKELETON DRAWING =================
 def draw_skeleton(window, skeleton, width, height):
     """Draw simple visualization of left arm"""
@@ -183,19 +185,18 @@ class KinectTracking(object):
         right_elbow    = tracked.SkeletonPositions[JointId.ElbowRight]
         right_wrist    = tracked.SkeletonPositions[JointId.WristRight]
 
+        target = np.array([left_wrist.x, left_wrist.y, left_wrist.z])
+        target_frame = np.eye(4)
+        target_frame[:3, 3] = target
+        angles = ben.left_arm.inverse_kinematics(target_frame, initial_position=[0]*len(ben.left_arm.links))
+       
 
-        # -----------Roll -----------
-        roll = 0
-        # ----------- SHOULDER -----------
-        pitch = 0
-        # ----------- ELBOW -----------
-        elbow_angle = 0
 
         # Build single message with all servo commands
         angles = {
-            13: pitch,
-            14: roll,
-            8: elbow_angle
+            13: angles[1],
+            14: angles[0],
+            8: angles[2]
         }
 
         self.send_all_servos(angles)

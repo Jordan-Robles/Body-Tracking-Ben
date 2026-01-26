@@ -192,14 +192,21 @@ class Ben():
         ax.set_zlim(0,0.4)
         ax.set_title("3-DOF Robot Arm Visualization")
         plt.show()
+
+        return ik_solution
     
 
 if __name__ == "__main__":
     ben = Ben()
+    
     """
-    left_angles = [0, np.radians(200), np.radians(90), np.radians(90),np.radians(0)]
+    
+    left_angles = [0, np.radians(0), np.radians(0), np.radians(0),np.radians(0)]
     right_angles = [0, np.radians(0), np.radians(0), np.radians(0),np.radians(0)]
-    ben.debug(left_angles,right_angles)
-    target_position = [0.2, 0.05, 0.15]
-    #ben.ik_target(target_position, ben.left_arm)
+    
+    #ben.debug(left_angles,right_angles)
+    target_position = [0.1, -0.1, 0.02]
+    ben.ik_target(target_position, ben.left_arm)
     """
+    
+    
