@@ -36,52 +36,48 @@ def draw_skeleton(window, skeleton, width, height):
         return
     
     # Get left shoulder and elbow positions
-    shoulder = skeleton.SkeletonPositions[JointId.ShoulderLeft]
-    elbow = skeleton.SkeletonPositions[JointId.ElbowLeft]
-    wrist = skeleton.SkeletonPositions[JointId.WristLeft]
+    shoulder_left = skeleton.SkeletonPositions[JointId.ShoulderLeft]
+    elbow_left = skeleton.SkeletonPositions[JointId.ElbowLeft]
+    wrist_left = skeleton.SkeletonPositions[JointId.WristLeft]
+
+    shoulder_right = skeleton.SkeletonPositions[JointId.ShoulderRight]
+    elbow_right  = skeleton.SkeletonPositions[JointId.ElbowRight]
+    wrist_right  = skeleton.SkeletonPositions[JointId.WristRight]
     
-    # Convert to screen coordinates
-    shoulder_x = int((shoulder.x + 1) * width / 2)
-    shoulder_y = int((-shoulder.y + 1) * height / 2)
+    shoulder_left_x = int((shoulder_left.x + 1) * width / 2)
+    shoulder_left_y = int((-shoulder_left.y + 1) * height / 2)
     
-    elbow_x = int((elbow.x + 1) * width / 2)
-    elbow_y = int((-elbow.y + 1) * height / 2)
+    elbow_left_x = int((elbow_left.x + 1) * width / 2)
+    elbow_left_y = int((-elbow_left.y + 1) * height / 2)
 
-    wrist_x = int((wrist.x + 1) * width / 2)
-    wrist_y = int((-wrist.y + 1) * height / 2) 
+    wrist_left_x = int((wrist_left.x + 1) * width / 2)
+    wrist_left_y = int((-wrist_left.y + 1) * height / 2) 
+
+
+    shoulder_right_x = int((shoulder_right.x + 1) * width / 2)
+    shoulder_right_y = int((-shoulder_right.y + 1) * height / 2)
     
-    #grab distance info
-    y_shoulder_to_elbow_px = abs(elbow_y - shoulder_y)
-    x_shoulder_to_elbow_px = abs(elbow_x - shoulder_x)
+    elbow_right_x = int((elbow_right.x + 1) * width / 2)
+    elbow_right_y = int((-elbow_right.y + 1) * height / 2)
 
-    #====skeleton===
-    # Draw line from shoulder to elbow
-    pygame.draw.line(window, (0, 255, 0), (shoulder_x, shoulder_y), (elbow_x, elbow_y), 3)
-    # Draw line from elbow to wrist
-    pygame.draw.line(window, (0, 255, 0), (elbow_x, elbow_y), (wrist_x, wrist_y), 3)
-    # Draw circle at shoulder
-    pygame.draw.circle(window, (0, 255, 0), (shoulder_x, shoulder_y), 5)
-    # Draw Circle at elbow
-    pygame.draw.circle(window, (0, 255, 0), (elbow_x, elbow_y), 5)
-    # Draw Circle at Wrist
-    pygame.draw.circle(window, (0, 255, 0), (wrist_x, wrist_y), 5)
-
-    #===x any y lines for shoulder to elbow===
-    pygame.draw.line(window, (255, 255, 0), (shoulder_x, shoulder_y), (elbow_x, shoulder_y), 3) #capturing the x pixel distance from shoudler to elbow
-    pygame.draw.line(window, (255, 255, 0), (elbow_x, elbow_y), (elbow_x, shoulder_y), 3) #capturing the y pixel distance from shoudler to elbow
-
-    #===x and y lines for elbow to wrist===
-    pygame.draw.line(window, (255, 255, 0), (elbow_x, elbow_y), (wrist_x, elbow_y), 3) #capturing the x pixel distance from shoudler to elbow
-    pygame.draw.line(window, (255, 255, 0), (wrist_x, wrist_y), (wrist_x, elbow_y), 3) #capturing the y pixel distance from shoudler to elbow
-
-    #display info
-    font = pygame.font.Font(None, 36)
-    text_y = font.render("Y Distance: %d px" % y_shoulder_to_elbow_px, True, (255,255,255))
-    text_x = font.render("X Distance: %d px" % x_shoulder_to_elbow_px, True, (255,255,255))
+    wrist_right_x = int((wrist_right.x + 1) * width / 2)
+    wrist_right_y = int((-wrist_right.y + 1) * height / 2)
     
 
-    window.blit(text_y, (10,10))
-    window.blit(text_x, (10,50))
+    #left side
+    pygame.draw.line(window, (0, 255, 0), (shoulder_left_x, shoulder_left_y), (elbow_left_x, elbow_left_y), 3) # Draw line from shoulder to elbow
+    pygame.draw.line(window, (0, 255, 0), (elbow_left_x, elbow_left_y), (wrist_left_x, wrist_left_y), 3) # Draw line from elbow to wrist
+    pygame.draw.circle(window, (0, 255, 0), (shoulder_left_x, shoulder_left_y), 5)# Draw circle at shoulder
+    pygame.draw.circle(window, (0, 255, 0), (elbow_left_x, elbow_left_y), 5)# Draw Circle at elbow
+    pygame.draw.circle(window, (255, 0, 0), (wrist_left_x, wrist_left_y), 5)# Draw Circle at Wrist
+
+    pygame.draw.line(window, (0, 255, 0), (shoulder_right_x, shoulder_right_y), (elbow_right_x, elbow_right_y), 3) # Draw line from shoulder to elbow
+    pygame.draw.line(window, (0, 255, 0), (elbow_right_x, elbow_right_y), (wrist_right_x, wrist_right_y), 3) # Draw line from elbow to wrist
+    pygame.draw.circle(window, (0, 255, 0), (shoulder_right_x, shoulder_right_y), 5)# Draw circle at shoulder
+    pygame.draw.circle(window, (0, 255, 0), (elbow_right_x, elbow_right_y), 5)# Draw Circle at elbow
+    pygame.draw.circle(window, (255, 0, 0), (wrist_right_x, wrist_right_y), 5)# Draw Circle at Wrist
+
+    
 
 # ================= MAIN =================
 def run():
@@ -120,11 +116,13 @@ def run():
             pygame_window.fill((0,0,0)) #fill the background BLACK
             
             # Display pitch value
+            right_target_string = np.array(tracker.right_target)
+ 
+
             font = pygame.font.Font(None, 36)
-            roll_text = font.render("roll: %d" % tracker.roll, True, (255, 255, 255))
-            pitch_text =font.render("pitch: %d" % tracker.pitch, True, (255, 255, 255))
-            pygame_window.blit(roll_text, (10, 70))
-            pygame_window.blit(pitch_text, (10, 90))
+            #end_eff_right_x = font.render("right_end: %d" % right_target_string, True, (255, 255, 255))
+            #pygame_window.blit(end_eff_right_x, (10, 70))
+
 
 
 
@@ -151,7 +149,9 @@ class KinectTracking(object):
         self.pitch = 0  # Store pitch for display
         self.elbow_angle = 0  # Store elbow angle for display
         self.roll = 0
-        self.previous_elbow_angle = 0  # Track previous elbow angle
+        self.right_target = 0
+        self.inital_left_ik = [0, 0, 0, 0, 0]
+        self.inital_right_ik = [0, 0, 0, 0, 0]
     
     
 
@@ -188,21 +188,26 @@ class KinectTracking(object):
         ]
 
         mapped_right_end_eff = [
-            (right_end_effector.x - right_end_effector.x),
-            (right_end_effector.y - right_end_effector.y),
-            (right_end_effector.z - right_end_effector.z)
+            (right_end_effector.x - right_origin.x),
+            (right_end_effector.y - right_origin.y),
+            (right_end_effector.z - right_origin.z)
         ]
 
-        left_target = np.array([-mapped_left_end_eff[2], mapped_left_end_eff[0], mapped_left_end_eff[1]])
+        self.left_target = np.array([-mapped_left_end_eff[2], mapped_left_end_eff[0], mapped_left_end_eff[1]])
+        
         target_frame = np.eye(4)
-        target_frame[:3, 3] = left_target
-        left_ik_sol = ben.left_arm.inverse_kinematics(target_frame, initial_position=[0]*len(ben.left_arm.links))
+        target_frame[:3, 3] = self.left_target
+        left_ik_sol = ben.left_arm.inverse_kinematics(target_frame, initial_position=self.inital_left_ik)
+        self.inital_left_ik = left_ik_sol
         left_angles_deg = np.degrees(left_ik_sol)
 
-        right_target = np.array([-mapped_left_end_eff[2], mapped_left_end_eff[0], mapped_left_end_eff[1]])
-        target_frame = np.eye(4)
-        target_frame[:3, 3] = right_target
-        right_ik_sol = ben.left_arm.inverse_kinematics(target_frame, initial_position=[0]*len(ben.right_arm.links))
+
+
+        self.right_target = np.array([mapped_right_end_eff[2], mapped_right_end_eff[0], mapped_right_end_eff[1]])
+        target_frame_right = np.eye(4)
+        target_frame_right[:3, 3] = self.right_target
+        right_ik_sol = ben.right_arm.inverse_kinematics(target_frame_right, initial_position=self.inital_right_ik)
+        self.inital_right_ik = right_ik_sol
         right_angles_deg = np.degrees(right_ik_sol)
 
         # Build single message with all servo commands
@@ -213,8 +218,8 @@ class KinectTracking(object):
             8: left_angles_deg[3],
 
             #right
-            16: right_angles_deg[2],
-            17: right_angles_deg[1],
+            16: right_angles_deg[1],
+            17: right_angles_deg[2],
             18: right_angles_deg[3]
         }
 
