@@ -3,7 +3,7 @@ import time
 import math
 import pygame
 import serial
-import benURDFV2
+import benURDFV3
 from collections import deque
 
 from pykinect import nui
@@ -27,7 +27,7 @@ print("Serial connected")
 SEND_INTERVAL = 0.1       # seconds (10 Hz)
 DEADBAND = 3              # degrees
 
-ben = benURDFV2.Ben()
+ben = benURDFV3.Ben()
 
 #================= SKELETON DRAWING =================
 def draw_skeleton(window, skeleton, width, height):
@@ -181,6 +181,9 @@ class KinectTracking(object):
         right_end_effector = tracked.SkeletonPositions[JointId.WristRight]
         right_origin = tracked.SkeletonPositions[JointId.ShoulderRight]
 
+        head_end_effector = tracked.SkeletonPositions[JointId.Head]
+        shoulderCentre = tracked.SkeletonPositions[JointId.ShoulderCenter]
+
         mapped_left_end_eff = [
             (left_end_effector.x - left_origin.x),
             (left_end_effector.y - left_origin.y),
@@ -192,6 +195,17 @@ class KinectTracking(object):
             (right_end_effector.y - right_origin.y),
             (right_end_effector.z - right_origin.z)
         ]
+
+        #head tricking just using trig 
+        head_position_x = (head_end_effector.x - shoulderCentre.x)
+        head_position_y = (head_end_effector.y - shoulderCentre.y)
+        head_angle = math.degrees(math.atan(head_position_x/head_position_y))
+        if head_position_x < 0:
+            head_angle = -head_angle
+        elif head_position_x >0:
+            head_angle =head_angle
+
+
 
         self.left_target = np.array([-mapped_left_end_eff[2], mapped_left_end_eff[0], mapped_left_end_eff[1]])
         
@@ -210,6 +224,7 @@ class KinectTracking(object):
         self.inital_right_ik = right_ik_sol
         right_angles_deg = np.degrees(right_ik_sol)
 
+
         # Build single message with all servo commands
         angles = {
             #left
@@ -220,7 +235,9 @@ class KinectTracking(object):
             #right
             16: right_angles_deg[1],
             17: right_angles_deg[2],
-            18: right_angles_deg[3]
+            18: right_angles_deg[3],
+
+            10: head_angle
         }
 
         self.send_all_servos(angles)

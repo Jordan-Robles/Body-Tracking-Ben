@@ -31,7 +31,7 @@ class Ben():
                 translation_vector=[0, -0.0588, 0],
                 orientation=[0, 0, -np.pi/2],
                 rotation=[1,0,0],
-                bounds=(np.radians(-45), np.radians(150))
+                bounds=(np.radians(-20), np.radians(150))
             ),
 
             #13
@@ -41,7 +41,7 @@ class Ben():
                 translation_vector=[0.0232, 0, -0.015],
                 orientation=[0, np.pi, np.pi],
                 rotation=[0, 1, 0],  
-                bounds=(np.radians(30), np.radians(150))
+                bounds=(np.radians(30), np.radians(90))
             ),
             #8
             #Left elbow pitch
@@ -50,7 +50,7 @@ class Ben():
                 translation_vector=[0, 0, 0.0935],
                 orientation=[0, 0, np.pi],
                 rotation=[0, 1, 0],   # Y axis
-                bounds=(np.radians(-120), np.radians(150))
+                bounds=(np.radians(0), np.radians(60))
             ),
             URDFLink(
                 name="wrist",
@@ -71,7 +71,7 @@ class Ben():
                 translation_vector=[0, 0.0588, 0],
                 orientation=[0,0,np.pi/2],
                 rotation=[1,0,0],
-                bounds=(np.radians(-45), np.radians(150))
+                bounds=(np.radians(-20), np.radians(150))
             ),
 
             #right shoulder (yaw)
@@ -80,7 +80,7 @@ class Ben():
                 translation_vector=[0.0232, 0, -0.015],
                 orientation=[0, np.pi, np.pi],
                 rotation=[0, 1, 0],   # Z axis
-                bounds=(np.radians(30), np.radians(150))
+                bounds=(np.radians(30), np.radians(90))
             ),
 
             #Right elbow pitch
@@ -89,7 +89,7 @@ class Ben():
                 translation_vector=[0, 0, 0.0935],
                 orientation=[0, 0, -np.pi],
                 rotation=[0, 1, 0],   # Y axis
-                bounds=(np.radians(-120), np.radians(150))
+                bounds=(np.radians(0), np.radians(60))
             ),
             URDFLink(
                 name="wrist",
