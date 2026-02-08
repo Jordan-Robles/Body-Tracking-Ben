@@ -1,7 +1,6 @@
 import numpy as np
 import time
 import math
-import pygame
 import serial
 import benURDFV3
 from collections import deque
@@ -29,64 +28,11 @@ DEADBAND = 3              # degrees
 
 ben = benURDFV3.Ben()
 
-#================= SKELETON DRAWING =================
-def draw_skeleton(window, skeleton, width, height):
-    """Draw simple visualization of left arm"""
-    if not skeleton:
-        return
-    
-    # Get left shoulder and elbow positions
-    shoulder_left = skeleton.SkeletonPositions[JointId.ShoulderLeft]
-    elbow_left = skeleton.SkeletonPositions[JointId.ElbowLeft]
-    wrist_left = skeleton.SkeletonPositions[JointId.WristLeft]
-
-    shoulder_right = skeleton.SkeletonPositions[JointId.ShoulderRight]
-    elbow_right  = skeleton.SkeletonPositions[JointId.ElbowRight]
-    wrist_right  = skeleton.SkeletonPositions[JointId.WristRight]
-    
-    shoulder_left_x = int((shoulder_left.x + 1) * width / 2)
-    shoulder_left_y = int((-shoulder_left.y + 1) * height / 2)
-    
-    elbow_left_x = int((elbow_left.x + 1) * width / 2)
-    elbow_left_y = int((-elbow_left.y + 1) * height / 2)
-
-    wrist_left_x = int((wrist_left.x + 1) * width / 2)
-    wrist_left_y = int((-wrist_left.y + 1) * height / 2) 
-
-
-    shoulder_right_x = int((shoulder_right.x + 1) * width / 2)
-    shoulder_right_y = int((-shoulder_right.y + 1) * height / 2)
-    
-    elbow_right_x = int((elbow_right.x + 1) * width / 2)
-    elbow_right_y = int((-elbow_right.y + 1) * height / 2)
-
-    wrist_right_x = int((wrist_right.x + 1) * width / 2)
-    wrist_right_y = int((-wrist_right.y + 1) * height / 2)
-    
-
-    #left side
-    pygame.draw.line(window, (0, 255, 0), (shoulder_left_x, shoulder_left_y), (elbow_left_x, elbow_left_y), 3) # Draw line from shoulder to elbow
-    pygame.draw.line(window, (0, 255, 0), (elbow_left_x, elbow_left_y), (wrist_left_x, wrist_left_y), 3) # Draw line from elbow to wrist
-    pygame.draw.circle(window, (0, 255, 0), (shoulder_left_x, shoulder_left_y), 5)# Draw circle at shoulder
-    pygame.draw.circle(window, (0, 255, 0), (elbow_left_x, elbow_left_y), 5)# Draw Circle at elbow
-    pygame.draw.circle(window, (255, 0, 0), (wrist_left_x, wrist_left_y), 5)# Draw Circle at Wrist
-
-    pygame.draw.line(window, (0, 255, 0), (shoulder_right_x, shoulder_right_y), (elbow_right_x, elbow_right_y), 3) # Draw line from shoulder to elbow
-    pygame.draw.line(window, (0, 255, 0), (elbow_right_x, elbow_right_y), (wrist_right_x, wrist_right_y), 3) # Draw line from elbow to wrist
-    pygame.draw.circle(window, (0, 255, 0), (shoulder_right_x, shoulder_right_y), 5)# Draw circle at shoulder
-    pygame.draw.circle(window, (0, 255, 0), (elbow_right_x, elbow_right_y), 5)# Draw Circle at elbow
-    pygame.draw.circle(window, (255, 0, 0), (wrist_right_x, wrist_right_y), 5)# Draw Circle at Wrist
 
     
 
 # ================= MAIN =================
 def run():
-    #pygame
-    pygame.init()
-    pygame_window = pygame.display.set_mode((window_height, window_width))
-    pygame.display.set_caption("Kinect Visual")
-    clock = pygame.time.Clock()
-
     #kinect 
     kinect = nui.Runtime()
     kinect.skeleton_engine.enabled = True
@@ -102,42 +48,18 @@ def run():
     tracker = KinectTracking()
     kinect.skeleton_frame_ready += tracker.skeleton_frame_ready
 
-
     print("Kinect started")
-    
-    pygame_running = True
+
     try:
-        while pygame_running:
-            for event in pygame.event.get():
-                if event.type==pygame.KEYDOWN:
-                    if event.key==pygame.K_ESCAPE:
-                        pygame_running = False
-
-            pygame_window.fill((0,0,0)) #fill the background BLACK
-            
-            # Display pitch value
-            right_target_string = np.array(tracker.right_target)
- 
-
-            font = pygame.font.Font(None, 36)
-            #end_eff_right_x = font.render("right_end: %d" % right_target_string, True, (255, 255, 255))
-            #pygame_window.blit(end_eff_right_x, (10, 70))
-
-
-
-
-            if tracker.current_skeleton:
-                draw_skeleton(pygame_window, tracker.current_skeleton, window_width, window_height)
-
-            pygame.display.flip()#update display
-
-            clock.tick(30) #fps = 30
-
+        while True:
+            time.sleep(0.01)
     except KeyboardInterrupt:
-        print("Shutting down...")
+        print("stopping")
         kinect.close()
         ser.close()
-        pygame.quit()
+
+    
+
 
 # ================= TRACKER =================
 class KinectTracking(object):
@@ -146,8 +68,6 @@ class KinectTracking(object):
         self.last_send_time = 0
         self.last_angles = {}
         self.current_skeleton = None #store for visualization
-        self.pitch = 0  # Store pitch for display
-        self.elbow_angle = 0  # Store elbow angle for display
         self.roll = 0
         self.right_target = 0
         self.inital_left_ik = [0, 0, 0, 0, 0]
@@ -157,27 +77,26 @@ class KinectTracking(object):
     
 
     def send_default_pose(self):
+        print("going to home pose")
         default_angles = {
             #left
-            13: 0,
+            13: 30,
             14: 0,
             8: 0,
             #right
             16: 0,
-            17: 0,
+            17: 30,
             18: 0,
+
             10: 0
         }      
-        self.send_all_servos(default_angles)
+        self.send_all_servos(default_angles, force=True)
         self.inital_left_ik = [0, 0, 0, 0, 0]
         self.inital_right_ik = [0, 0, 0, 0, 0]
 
 
     def skeleton_frame_ready(self, skeleton_frame):
         now = time.time()
-        if now - self.last_send_time < SEND_INTERVAL:
-            return
-
         skeletons = skeleton_frame.SkeletonData
         tracked = None
 
@@ -187,13 +106,16 @@ class KinectTracking(object):
                 break
 
         if not tracked:
-            self.current_skeleton =None
-            
+            self.current_skeleton =None 
+
             if self.was_tracked:
+                print("not tracked") 
                 self.send_default_pose()
-                self.was_tracked = False 
-                print("not tracked")   
+                self.was_tracked = False
+                self.last_send_time = now
         
+            return
+        if now - self.last_send_time < SEND_INTERVAL:
             return
 
 
@@ -225,11 +147,14 @@ class KinectTracking(object):
         #head tricking just using trig 
         head_position_x = (head_end_effector.x - shoulderCentre.x)
         head_position_y = (head_end_effector.y - shoulderCentre.y)
-        head_angle = math.degrees(math.atan(head_position_x/head_position_y))
-        if head_position_x < 0:
-            head_angle = -head_angle
-        elif head_position_x >0:
-            head_angle =head_angle
+        head_angle_raw = math.degrees(math.atan(head_position_x/head_position_y))
+
+        if head_end_effector.x < shoulderCentre.x:
+            head_angle = -abs(head_angle_raw-30)
+        
+        elif head_end_effector.x > shoulderCentre.x:
+            head_angle = abs(head_angle_raw)
+            
 
 
 
@@ -269,14 +194,14 @@ class KinectTracking(object):
         self.send_all_servos(angles)
         self.last_send_time = now
 
-    def send_all_servos(self, angles):
+    def send_all_servos(self, angles, force=False):
         """Send all servo commands in a single serial message"""
         # Check which servos need updating
         to_send = {}
         for servo_id, angle in angles.items():
             last = self.last_angles.get(servo_id)
             
-            if last is None or abs(angle - last) >= DEADBAND:
+            if force or last is None or abs(angle - last) >= DEADBAND:
                 to_send[servo_id] = angle
                 self.last_angles[servo_id] = angle
         

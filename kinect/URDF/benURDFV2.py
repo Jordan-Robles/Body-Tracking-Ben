@@ -199,10 +199,10 @@ class Ben():
 if __name__ == "__main__":
     ben = Ben()
     
-    left = 1
-    left_angles = [0, np.radians(0), np.radians(90), np.radians(0),np.radians(0)]
-    right_angles = [0, np.radians(0), np.radians(90), np.radians(0),np.radians(0)]
-    #ben.debug(left_angles,right_angles)
+    left = 0
+    left_angles = [0, np.radians(0), np.radians(0), np.radians(0),np.radians(0)]
+    right_angles = [0, np.radians(0), np.radians(0), np.radians(0),np.radians(0)]
+    
     
     if left == 1:
 
@@ -211,12 +211,13 @@ if __name__ == "__main__":
         #ben.debug(left_angles,right_angles)
         target_position = [0.1, -0.1, 0.02]
         ben.ik_target(target_position, ben.left_arm)
-    else:
-
+    elif left == 2:
         #ben.debug(left_angles,right_angles)
         target_position = [0.1, 0.1, 0.02]
         ben.ik_target(target_position, ben.right_arm)
-    
+    elif left == 0:
+        ben.debug(left_angles,right_angles)
+
 
     
     
